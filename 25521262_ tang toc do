@@ -1,0 +1,20 @@
+// Chau Phuoc Nha
+#include <iostream>
+using namespace std;
+int speed = 200;        // tốc độ ban đầu (ms)
+const int MIN_SPEED = 50;  // nhanh nhất
+const int SPEED_STEP = 10; // mỗi lần xóa dòng giảm bao nhiêu
+void increaseSpeed(int linesCleared) {
+    // linesCleared: số dòng vừa xóa (do hàm removeLine trả về hoặc bạn tự truyền vào)
+
+    speed -= linesCleared * SPEED_STEP;
+
+    if (speed < MIN_SPEED)
+        speed = MIN_SPEED;
+}
+int main() {
+    _sleep(speed);
+    int lines = removeLine();
+    increaseSpeed(lines);
+    return 0;
+}
