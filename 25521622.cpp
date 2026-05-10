@@ -4,7 +4,6 @@
 // - Dieu chinh cach hien thi board trong console
 // - Su dung moi o 2 ky tu de dam bao block hien thi vuong (khong con HCN)
 // - Cai tien vien bang ky tu "[]" de ro rang hon
-//
 // LUU Y:
 // - File nay chi dung de test giao dien
 // - Khi merge vao file FINAL, chi can copy ham draw() de thay the draw cu
