@@ -1,0 +1,307 @@
+// TETRIS - XOAY & PAUSE VERSION
+// File: XoayVaPause.cpp
+// NOTE: Bài này refactor từ struct -> class để áp dụng OOP + đa hình cho xoay block
+
+
+
+#include <iostream>
+#include <conio.h>
+#include <windows.h>
+#include <time.h>
+
+using namespace std;
+
+#define H 20
+#define W 15
+
+// CLASS CHA (ĐA HÌNH)
+class Piece {
+protected:
+    char shape[4][4];
+
+public:
+    // Hàm ảo thuần (bắt buộc lớp con override)
+    virtual void rotate() = 0;
+
+    // Lấy shape của block hiện tại
+    virtual char (*getShape())[4] = 0;
+
+    virtual ~Piece() {}
+};
+
+
+
+// CLASS BLOCK TETRIS (KẾ THỪA)
+
+class TetrisPiece : public Piece {
+public:
+    TetrisPiece(char init[4][4]) {
+        // Copy dữ liệu block vào object
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                shape[i][j] = init[i][j];
+    }
+
+    char (*getShape())[4] override {
+        return shape;
+    }
+
+    // XOAY BLOCK 90 ĐỘ THEO CHIỀU KIM ĐỒNG HỒ
+    void rotate() override {
+        char temp[4][4];
+
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                temp[j][3 - i] = shape[i][j];
+
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                shape[i][j] = temp[i][j];
+    }
+};
+
+// DATA BLOCK GỐC
+
+char blocksData[][4][4] = {
+    {{' ','I',' ',' '},{' ','I',' ',' '},{' ','I',' ',' '},{' ','I',' ',' '}},
+    {{' ',' ',' ',' '},{' ','O','O',' '},{' ','O','O',' '},{' ',' ',' ',' '}},
+    {{' ',' ',' ',' '},{' ','T',' ',' '},{'T','T','T',' '},{' ',' ',' ',' '}},
+    {{' ',' ',' ',' '},{' ','S','S',' '},{'S','S',' ',' '},{' ',' ',' ',' '}},
+    {{' ',' ',' ',' '},{'Z','Z',' ',' '},{' ','Z','Z',' '},{' ',' ',' ',' '}},
+    {{' ',' ',' ',' '},{'J',' ',' ',' '},{'J','J','J',' '},{' ',' ',' ',' '}},
+    {{' ',' ',' ',' '},{' ',' ','L',' '},{'L','L','L',' '},{' ',' ',' ',' '}}
+};
+
+Piece* currentPiece;
+
+// BIẾN GAME
+
+char board[H][W] = {};
+int x = 5, y = 0;
+int b;
+
+int score = 0;
+int speed = 200;
+const int MIN_SPEED = 50;
+const int SPEED_STEP = 10;
+
+// BIẾN PAUSE GAME
+bool paused = false;
+
+
+
+// DI CHUYỂN CONSOLE
+
+void gotoxy(int x, int y) {
+    COORD c = {(SHORT)x, (SHORT)y};
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), c);
+}
+
+// KHỞI TẠO BOARD
+
+void initBoard() {
+    for (int i = 0; i < H; i++)
+        for (int j = 0; j < W; j++)
+            board[i][j] = (i == H - 1 || j == 0 || j == W - 1) ? '#' : ' ';
+}
+
+
+
+// SINH BLOCK MỚI
+
+void spawnNewPiece() {
+    b = rand() % 7;
+    currentPiece = new TetrisPiece(blocksData[b]);
+}
+
+// LẤY SHAPE HIỆN TẠI
+char (*shape())[4] {
+    return currentPiece->getShape();
+}
+
+
+
+// VẼ GAME
+
+void draw() {
+    gotoxy(0, 0);
+
+    for (int i = 0; i < H; i++) {
+        for (int j = 0; j < W; j++) {
+            if (board[i][j] == '#') cout << "[]";
+            else cout << "  ";
+        }
+        cout << endl;
+    }
+
+    cout << "\n========== TETRIS ==========" << endl;
+    cout << "SCORE : " << score << endl;
+    cout << "SPEED : " << speed << endl;
+    cout << "PAUSE : " << (paused ? "ON" : "OFF") << endl;
+}
+
+
+
+// XOÁ BLOCK TẠM TRÊN BOARD
+
+void boardDelBlock() {
+    auto s = shape();
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            if (s[i][j] != ' ')
+                board[y + i][x + j] = ' ';
+}
+
+
+
+// VẼ BLOCK LÊN BOARD
+
+void block2Board() {
+    auto s = shape();
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            if (s[i][j] != ' ')
+                board[y + i][x + j] = s[i][j];
+}
+
+
+
+// CHECK DI CHUYỂN
+
+bool canMove(int dx, int dy) {
+    auto s = shape();
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            if (s[i][j] != ' ') {
+                int tx = x + j + dx;
+                int ty = y + i + dy;
+                if (tx < 1 || tx >= W - 1 || ty >= H - 1) return false;
+                if (board[ty][tx] != ' ') return false;
+            }
+    return true;
+}
+
+// ===============================
+// CHECK XOAY (THỬ XOAY TRƯỚC)
+// ===============================
+bool canRotate() {
+    Piece* temp = new TetrisPiece(*dynamic_cast<TetrisPiece*>(currentPiece));
+    temp->rotate();
+
+    auto s = temp->getShape();
+
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            if (s[i][j] != ' ') {
+                int tx = x + j;
+                int ty = y + i;
+                if (tx < 1 || tx >= W - 1 || ty >= H - 1) return false;
+                if (board[ty][tx] != ' ') return false;
+            }
+
+    delete temp;
+    return true;
+}
+
+
+
+// XOAY BLOCK THẬT
+void rotateBlock() {
+    currentPiece->rotate();
+}
+
+// XOÁ HÀNG ĐẦY
+
+int removeLines() {
+    int lines = 0;
+    for (int i = H - 2; i >= 0; i--) {
+        bool full = true;
+        for (int j = 1; j < W - 1; j++)
+            if (board[i][j] == ' ') full = false;
+
+        if (full) {
+            lines++;
+            for (int k = i; k > 0; k--)
+                for (int j = 1; j < W - 1; j++)
+                    board[k][j] = board[k - 1][j];
+            i++;
+        }
+    }
+    return lines;
+}
+
+
+
+// TĂNG TỐC ĐỘ GAME
+
+void increaseSpeed(int l) {
+    speed -= l * SPEED_STEP;
+    if (speed < MIN_SPEED) speed = MIN_SPEED;
+}
+
+
+
+// CHECK GAME OVER
+
+bool gameOver() {
+    for (int j = 1; j < W - 1; j++)
+        if (board[0][j] != ' ') return true;
+    return false;
+}
+
+
+
+// MAIN GAME LOOP
+
+int main() {
+    srand(time(0));
+    system("cls");
+
+    initBoard();
+    spawnNewPiece();
+
+    while (1) {
+        boardDelBlock();
+
+        if (_kbhit()) {
+            char c = _getch();
+
+            // PAUSE GAME
+            if (c == 'p') paused = !paused;
+            if (paused) { draw(); continue; }
+
+            if (c == 'a' && canMove(-1,0)) x--;
+            if (c == 'd' && canMove(1,0)) x++;
+            if (c == 's' && canMove(0,1)) y++;
+            if (c == 'w' && canRotate()) rotateBlock();
+            if (c == 'q') break;
+        }
+
+        if (!paused) {
+            if (canMove(0,1)) y++;
+            else {
+                block2Board();
+
+                int l = removeLines();
+                score += l * 100;
+                increaseSpeed(l);
+
+                x = 5; y = 0;
+                delete currentPiece;
+                spawnNewPiece();
+
+                if (gameOver()) {
+                    system("cls");
+                    cout << "GAME OVER\nSCORE: " << score << endl;
+                    break;
+                }
+            }
+        }
+
+        block2Board();
+        draw();
+        Sleep(speed);
+    }
+
+    return 0;
+}
