@@ -1,13 +1,37 @@
-//Thêm hàm này vào 
-void hardDrop() {
+// Dán phía trên hàm main
+
+void handleHardDrop() {
+    boardDelBlock(); 
+
     while (canMove(0, 1)) {
         y++;
     }
-}
 
-//Cập nhật trong hàm main
-// Tìm đoạn if (_kbhit()) và thêm vào như sau:
-else if (c == ' ') { 
-    hardDrop();
+    block2Board();
+    
     soundDrop();
 }
+
+
+// Dán vào trong block check phím
+    // Tìm trong hàm main(), đoạn xử lý _kbhit():
+    if (_kbhit()) {
+        char c = _getch();
+        
+
+        // THÊM ĐOẠN NÀY:
+        else if (c == ' ') { 
+            handleHardDrop();
+            
+            // Ép game vẽ lại ngay lập tức để thấy kết quả rơi
+            draw(); 
+        }
+    }
+
+
+
+// Trong hàm draw
+
+    cout << "W : ROTATE" << endl;
+    cout << "SPACE : HARD DROP" << endl; // Thêm dòng này để người dùng biết phím tắt
+    cout << "Q : QUIT" << endl;
