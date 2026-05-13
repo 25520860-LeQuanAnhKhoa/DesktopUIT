@@ -69,7 +69,7 @@ int b;
 int score = 0;
 
 int speed = 200;
-
+int gameMode=1;
 const int MIN_SPEED = 50;
 const int SPEED_STEP = 10;
 
@@ -151,7 +151,7 @@ void draw() {
     cout << "========== TETRIS ==========" << endl;
     cout << "SCORE : " << score << endl;
     cout << "SPEED : " << speed << endl;
-
+    cout << "MODE  : " << (gameMode == 1 ? "EASY" : "HARD") << endl;
     cout << endl;
     cout << "A : LEFT" << endl;
     cout << "D : RIGHT" << endl;
@@ -312,7 +312,12 @@ int removeLines() {
 
 void increaseSpeed(int linesCleared) {
 
-    speed -= linesCleared * SPEED_STEP;
+    if (gameMode == 1) {
+        speed -= linesCleared * 5;     // EASY tăng chậm
+    }
+    else {
+        speed -= linesCleared * 20;    // HARD tăng mạnh
+    }
 
     if (speed < MIN_SPEED)
         speed = MIN_SPEED;
@@ -334,6 +339,18 @@ int main() {
     srand((unsigned int)time(0));
 
     system("cls");
+    cout << "====== TETRIS ======" << endl;
+    cout << "1. EASY MODE" << endl;
+    cout << "2. HARD MODE" << endl;
+    cout << "Choose mode: ";
+    cin >> gameMode;
+
+    if (gameMode == 1) {
+        speed = 300;   // rơi chậm
+    }
+    else {
+        speed = 120;   // rơi nhanh
+    }
 
     initBoard();
 
@@ -392,7 +409,10 @@ int main() {
 
             int lines = removeLines();
 
-            score += lines * 100;
+            if (gameMode == 1)
+                score += lines * 100;
+            else
+                score += lines * 200;   // HARD x2 điểm
             if (lines > 0) {
                 soundClear();
             }
