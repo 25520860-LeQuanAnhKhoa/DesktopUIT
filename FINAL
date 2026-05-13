@@ -73,6 +73,28 @@ int speed = 200;
 const int MIN_SPEED = 50;
 const int SPEED_STEP = 10;
 
+void soundMove() {
+    Beep(600, 50);     // di chuyển
+}
+
+void soundRotate() {
+    Beep(800, 80);     // xoay
+}
+
+void soundDrop() {
+    Beep(500, 40);     // rơi
+}
+
+void soundClear() {
+    Beep(1000, 150);   // ăn dòng
+}
+
+void soundGameOver() {
+    Beep(400, 300);
+    Beep(300, 300);
+    Beep(200, 500);
+}
+
 void gotoxy(int x, int y) {
 
     COORD c = { (SHORT)x, (SHORT)y };
@@ -329,24 +351,28 @@ int main() {
 
                 if (canMove(-1, 0))
                     x--;
+                    soundMove();
             }
 
             else if (c == 'd') {
 
                 if (canMove(1, 0))
                     x++;
+                    soundMove();
             }
 
             else if (c == 's') {
 
                 if (canMove(0, 1))
                     y++;
+                    soundDrop();
             }
 
             else if (c == 'w') {
 
                 if (canRotate())
                     rotateBlock();
+                    soundRotate();
             }
 
             else if (c == 'q') {
@@ -367,6 +393,9 @@ int main() {
             int lines = removeLines();
 
             score += lines * 100;
+            if (lines > 0) {
+                soundClear();
+            }
 
             increaseSpeed(lines);
 
@@ -383,7 +412,7 @@ int main() {
                 cout << "========= GAME OVER =========" << endl;
                 cout << "FINAL SCORE : " << score << endl;
                 cout << "=============================" << endl;
-
+                soundGameOver();
                 break;
             }
         }
