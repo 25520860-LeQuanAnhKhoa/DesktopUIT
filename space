@@ -1,0 +1,13 @@
+//Thêm hàm này vào 
+void hardDrop() {
+    while (canMove(0, 1)) {
+        y++;
+    }
+}
+
+//Cập nhật trong hàm main
+// Tìm đoạn if (_kbhit()) và thêm vào như sau:
+else if (c == ' ') { 
+    hardDrop();
+    soundDrop();
+}
