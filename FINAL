@@ -250,31 +250,51 @@ char (*shape())[4] {
 // ==========================================
 
 void draw() {
-    system("cls");
+
+    gotoxy(0, 0);   // quay về đầu màn hình
+    setColor(7);
 
     for (int i = 0; i < H; i++) {
+
         for (int j = 0; j < W; j++) {
 
-            if (board[i][j] == ' ') {
-                setColor(7);       // xám
+            char cell = board[i][j];
+
+            if (cell == ' ') {
+                setColor(7);
                 cout << "  ";
             }
             else {
-                setColor(10);      // xanh lá
+                int color = 7;
+
+                switch (cell) {
+                case 'I': color = 9; break;
+                case 'O': color = 14; break;
+                case 'T': color = 13; break;
+                case 'Z': color = 12; break;
+                case 'S': color = 10; break;
+                case 'J': color = 11; break;
+                case 'L': color = 15; break;
+                case '#': color = 8; break;
+                }
+
+                setColor(color);
                 cout << "[]";
             }
         }
-        cout << endl;
+
+        cout << "\n";
     }
 
-    // In thông tin game
-    setColor(14);  // vàng
-    cout << "\n====== TETRIS ======\n";
-    cout << "SCORE : " << score << endl;
-    cout << "SPEED : " << speed << endl;
-    cout << "MODE  : " << (gameMode == 1 ? "EASY" : "HARD") << endl;
+    // In thong tin game
 
-    setColor(11);  // cyan
+    setColor(14);
+    cout << "\n====== TETRIS ======\n";
+    cout << "SCORE : " << score << "\n";
+    cout << "SPEED : " << speed << "\n";
+    cout << "MODE  : " << (gameMode == 1 ? "EASY" : "HARD") << "\n";
+
+    setColor(11);
     cout << "\nA : LEFT\n";
     cout << "D : RIGHT\n";
     cout << "S : DOWN\n";
@@ -283,7 +303,7 @@ void draw() {
     cout << "P : PAUSE\n";
     cout << "Q : QUIT\n";
 
-    setColor(7); // reset lại màu
+    setColor(7);
 }
 // ==========================================
 // DELETE TEMP BLOCK
@@ -483,6 +503,18 @@ bool gameOver() {
 }
 
 // ==========================================
+// HIDE CURSOR
+// ==========================================
+
+void hideCursor() {
+    HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_CURSOR_INFO info;
+    info.dwSize = 100;
+    info.bVisible = FALSE;
+    SetConsoleCursorInfo(consoleHandle, &info);
+}
+
+// ==========================================
 // MAIN
 // ==========================================
 
@@ -490,8 +522,8 @@ int main() {
 
     srand((unsigned int)time(0));
 
-    system("cls");
-
+    gotoxy(0, 0);
+    hideCursor();
     cout << "====== TETRIS ======" << endl;
     cout << "1. EASY MODE" << endl;
     cout << "2. HARD MODE" << endl;
