@@ -153,6 +153,14 @@ int gameMode = 1;
 const int MIN_SPEED = 50;
 
 // ==========================================
+// SET COLOR
+// ==========================================
+
+void setColor(int color) {
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
+}
+
+// ==========================================
 // SOUND
 // ==========================================
 
@@ -242,41 +250,41 @@ char (*shape())[4] {
 // ==========================================
 
 void draw() {
-
-    gotoxy(0, 0);
+    system("cls");
 
     for (int i = 0; i < H; i++) {
-
         for (int j = 0; j < W; j++) {
 
-            if (board[i][j] == ' ')
+            if (board[i][j] == ' ') {
+                setColor(7);       // xám
                 cout << "  ";
-
-            else
+            }
+            else {
+                setColor(10);      // xanh lá
                 cout << "[]";
+            }
         }
-
         cout << endl;
     }
 
-    cout << endl;
-    cout << "========== TETRIS ==========" << endl;
+    // In thông tin game
+    setColor(14);  // vàng
+    cout << "\n====== TETRIS ======\n";
     cout << "SCORE : " << score << endl;
     cout << "SPEED : " << speed << endl;
-    cout << "MODE  : "
-        << (gameMode == 1 ? "EASY" : "HARD")
-        << endl;
+    cout << "MODE  : " << (gameMode == 1 ? "EASY" : "HARD") << endl;
 
-    cout << endl;
-    cout << "A : LEFT" << endl;
-    cout << "D : RIGHT" << endl;
-    cout << "S : DOWN" << endl;
-    cout << "W : ROTATE" << endl;
-    cout << "SPACE : HARD DROP" << endl;
-    cout << "P : PAUSE" << endl;
-    cout << "Q : QUIT" << endl;
+    setColor(11);  // cyan
+    cout << "\nA : LEFT\n";
+    cout << "D : RIGHT\n";
+    cout << "S : DOWN\n";
+    cout << "W : ROTATE\n";
+    cout << "SPACE : HARD DROP\n";
+    cout << "P : PAUSE\n";
+    cout << "Q : QUIT\n";
+
+    setColor(7); // reset lại màu
 }
-
 // ==========================================
 // DELETE TEMP BLOCK
 // ==========================================
