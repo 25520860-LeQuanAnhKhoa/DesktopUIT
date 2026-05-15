@@ -7,7 +7,7 @@
 #include <windows.h>
 #include <ctime>
 #include <cctype> // FIX: Thêm thư viện này để dùng hàm tolower()
-
+#include <string>
 using namespace std;
 
 #define H 20
@@ -283,7 +283,6 @@ void draw() {
     gotoxy(0, 0);
     cout << output;
 }
-
 // ==========================================
 // DELETE TEMP BLOCK
 // ==========================================
