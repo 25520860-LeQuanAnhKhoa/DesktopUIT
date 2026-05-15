@@ -251,59 +251,45 @@ char (*shape())[4] {
 
 void draw() {
 
-    gotoxy(0, 0);   // quay về đầu màn hình
-    setColor(7);
+    static char buffer[H][W];
+    static string output;
 
+    output.clear();
+
+    // Copy board vào buffer
     for (int i = 0; i < H; i++) {
-
         for (int j = 0; j < W; j++) {
-
-            char cell = board[i][j];
-
-            if (cell == ' ') {
-                setColor(7);
-                cout << "  ";
-            }
-            else {
-                int color = 7;
-
-                switch (cell) {
-                case 'I': color = 9; break;
-                case 'O': color = 14; break;
-                case 'T': color = 13; break;
-                case 'Z': color = 12; break;
-                case 'S': color = 10; break;
-                case 'J': color = 11; break;
-                case 'L': color = 15; break;
-                case '#': color = 8; break;
-                }
-
-                setColor(color);
-                cout << "[]";
-            }
+            buffer[i][j] = board[i][j];
         }
-
-        cout << "\n";
     }
 
-    // In thong tin game
+    // Render buffer thành string 1 lần
+    for (int i = 0; i < H; i++) {
+        for (int j = 0; j < W; j++) {
+            if (buffer[i][j] == ' ')
+                output += "  ";
+            else
+                output += "[]";
+        }
+        output += '\n';
+    }
 
-    setColor(14);
-    cout << "\n====== TETRIS ======\n";
-    cout << "SCORE : " << score << "\n";
-    cout << "SPEED : " << speed << "\n";
-    cout << "MODE  : " << (gameMode == 1 ? "EASY" : "HARD") << "\n";
+    output += "\n========== TETRIS ==========\n";
+    output += "SCORE : " + to_string(score) + "\n";
+    output += "SPEED : " + to_string(speed) + "\n";
+    output += "MODE  : ";
+    output += (gameMode == 1 ? "EASY\n" : "HARD\n");
 
-    setColor(11);
-    cout << "\nA : LEFT\n";
-    cout << "D : RIGHT\n";
-    cout << "S : DOWN\n";
-    cout << "W : ROTATE\n";
-    cout << "SPACE : HARD DROP\n";
-    cout << "P : PAUSE\n";
-    cout << "Q : QUIT\n";
+    output += "\nA : LEFT\n";
+    output += "D : RIGHT\n";
+    output += "S : DOWN\n";
+    output += "W : ROTATE\n";
+    output += "SPACE : HARD DROP\n";
+    output += "P : PAUSE\n";
+    output += "Q : QUIT\n";
 
-    setColor(7);
+    gotoxy(0, 0);
+    cout << output;
 }
 // ==========================================
 // DELETE TEMP BLOCK
