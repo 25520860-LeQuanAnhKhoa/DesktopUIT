@@ -1,0 +1,51 @@
+// ==========================================
+// DRAW (CẬP NHẬT GIAO DIỆN KHỐI GẠCH TRẮNG)
+// ==========================================
+
+void draw() {
+
+    static char buffer[H][W];
+    static string output;
+
+    output.clear();
+
+    // Copy board vào buffer
+    for (int i = 0; i < H; i++) {
+        for (int j = 0; j < W; j++) {
+            buffer[i][j] = board[i][j];
+        }
+    }
+
+    // Render buffer thành string 1 lần
+    for (int i = 0; i < H; i++) {
+        for (int j = 0; j < W; j++) {
+            if (buffer[i][j] == ' ') {
+                output += "  ";        
+            } 
+            else if (buffer[i][j] == '#') {
+                output += "\xB2\xB2";  
+            } 
+            else {
+                output += "\xDB\xDB";  
+            }
+        }
+        output += '\n';
+    }
+
+    output += "\n========== TETRIS ==========\n";
+    output += "SCORE : " + to_string(score) + "\n";
+    output += "SPEED : " + to_string(speed) + "\n";
+    output += "MODE  : ";
+    output += (gameMode == 1 ? "EASY\n" : "HARD\n");
+
+    output += "\nA : LEFT\n";
+    output += "D : RIGHT\n";
+    output += "S : DOWN\n";
+    output += "W : ROTATE\n";
+    output += "SPACE : HARD DROP\n";
+    output += "P : PAUSE\n";
+    output += "Q : QUIT\n";
+
+    gotoxy(0, 0);
+    cout << output;
+}
